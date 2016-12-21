@@ -14,19 +14,20 @@ module Griddler
 
       def normalize_params
         {
-          to: to_recipients,
-          cc: cc_recipients,
-          bcc: Array.wrap(param_or_header(:Bcc)),
-          from: determine_sender,
-          subject: params[:subject],
-          text: params['stripped-text'],
-          html: params['body-html'],
+          to:          to_recipients,
+          cc:          cc_recipients,
+          bcc:         Array.wrap(param_or_header(:Bcc)),
+          from:        determine_sender,
+          subject:     params[:subject],
+          text:        params['stripped-text'],
+          html:        params['body-html'],
           attachments: attachment_files,
-          headers: headers
+          headers:     headers,
+          content_ids: content_id_map
         }
       end
 
-    private
+      private
 
       def determine_sender
         sender = param_or_header(:From)
@@ -52,7 +53,7 @@ module Griddler
         extracted_headers = {}
         if params['message-headers']
           parsed_headers = JSON.parse(params['message-headers'])
-          parsed_headers.each{ |h| extracted_headers[h[0]] = h[1] }
+          parsed_headers.each { |h| extracted_headers[h[0]] = h[1] }
         end
         ActiveSupport::HashWithIndifferentAccess.new(extracted_headers)
       end
@@ -64,6 +65,14 @@ module Griddler
           headers[key]
         else
           nil
+        end
+      end
+
+      def content_id_map
+        if params['content-id-map'].present?
+          JSON.parse(params['content-id-map']).sort { |x, y| x.dig(1) <=> y.dig(1) }.to_h.keys
+        else
+          {}
         end
       end
 
