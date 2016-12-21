@@ -11,7 +11,6 @@ module Griddler
     def content_ids
       @params[:content_ids].presence || []
     end
-
   end
 end
 
