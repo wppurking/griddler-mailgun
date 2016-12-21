@@ -68,11 +68,16 @@ module Griddler
         end
       end
 
+      # content_id_map 与 attachment_files 的数量一致. 索引位置一致, 用于获取 content_id
       def content_id_map
-        if params['content-id-map'].present?
-          JSON.parse(params['content-id-map']).sort { |x, y| x.dig(1) <=> y.dig(1) }.to_h.keys
+        if params["attachment-count"].present? && params['content-id-map'].present?
+          attachment_count = params["attachment-count"].to_i
+          id_map           = JSON.parse(params['content-id-map'])
+          attachment_count.times.map do |index|
+            id_map.key("attachment-#{index+1}")
+          end
         else
-          {}
+          []
         end
       end
 

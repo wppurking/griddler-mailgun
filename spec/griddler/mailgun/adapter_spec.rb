@@ -19,33 +19,47 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
     expect(normalized_params[:cc]).to eq ["Brandon Stark <brandon@example.com>", "Arya Stark <arya@example.com>"]
   end
 
-  it 'passes the received array of files and content-id-map' do
-    params = default_params.merge(
-      'attachment-count' => 2,
-      'attachment-1'     => upload_1,
-      'attachment-2'     => upload_2,
-      "content-id-map"   => { "<ii_2591056836db1a98>" => "attachment-2", "<ii_1591056836db1a98>" => "attachment-1" }.to_json
-    )
+  context 'attachments' do
+    it 'passes the received array of files and content-id-map' do
+      params            = default_params.merge(
+        'attachment-count' => 2,
+        'attachment-1'     => upload_1,
+        'attachment-2'     => upload_2,
+        "content-id-map"   => { "<ii_2591056836db1a98>" => "attachment-2", "<ii_1591056836db1a98>" => "attachment-1" }.to_json
+      )
+      normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+      expect(normalized_params[:attachments]).to eq [upload_1, upload_2]
 
-    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
-    expect(normalized_params[:attachments]).to eq [upload_1, upload_2]
+      cids = normalized_params[:content_ids]
+      expect(cids).to eq ["<ii_1591056836db1a98>", "<ii_2591056836db1a98>"]
+    end
 
-    cids = normalized_params[:content_ids]
-    expect(cids).to eq ["<ii_1591056836db1a98>", "<ii_2591056836db1a98>"]
-  end
+    it 'has attachment and inline files' do
+      params            = default_params.merge(
+        'attachment-count' => 2,
+        'attachment-1'     => upload_1,
+        'attachment-2'     => upload_2,
+        "content-id-map"   => { "<ii_2591056836db1a98>" => "attachment-2" }.to_json
+      )
+      normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+      expect(normalized_params[:attachments]).to eq [upload_1, upload_2]
+      cids = normalized_params[:content_ids]
+      expect(cids).to eq [nil, "<ii_2591056836db1a98>"]
+    end
 
-  it "receives attachments sent from store action" do
-    params            = default_params.merge(
-      "attachments" => [{ url: "sample.url", name: "sample name" },
-                        { url: "sample2.url", name: "sample name 2" }]
-    )
-    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
-    expect(normalized_params[:attachments].length).to eq 2
-  end
+    it "receives attachments sent from store action" do
+      params            = default_params.merge(
+        "attachments" => [{ url: "sample.url", name: "sample name" },
+                          { url: "sample2.url", name: "sample name 2" }]
+      )
+      normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+      expect(normalized_params[:attachments].length).to eq 2
+    end
 
-  it 'has no attachments' do
-    normalized_params = Griddler::Mailgun::Adapter.normalize_params(default_params)
-    expect(normalized_params[:attachments]).to be_empty
+    it 'has no attachments' do
+      normalized_params = Griddler::Mailgun::Adapter.normalize_params(default_params)
+      expect(normalized_params[:attachments]).to be_empty
+    end
   end
 
   it 'gets sender from headers' do
