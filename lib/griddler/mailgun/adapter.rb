@@ -19,7 +19,7 @@ module Griddler
           bcc: Array.wrap(param_or_header(:Bcc)),
           from: determine_sender,
           subject: params[:subject],
-          text: params['body-plain'],
+          text: params['stripped-text'],
           html: params['body-html'],
           attachments: attachment_files,
           headers: serialized_headers
