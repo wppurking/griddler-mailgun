@@ -11,7 +11,8 @@ module Griddler
     CLIENT_PATTERNS = {
       # outlook web
       outlook_web: /prod\.outlook\.com/,
-      gmail:       /mail\.gmail\.com/
+      gmail:       /mail\.gmail\.com/,
+      icloud:      /icloud\.com/
     }
 
     def content_ids
@@ -49,6 +50,9 @@ module Griddler
         doc.at_css('body > #divtagdefaultwrapper').to_s
       when :gmail
         doc.at_css('body > .gmail_extra > .gmail_quote').remove
+        doc.at_css('body').inner_html
+      when :icloud
+        doc.at_css('body > div > blockquote[type=cite]').remove
         doc.at_css('body').inner_html
       end
     end
