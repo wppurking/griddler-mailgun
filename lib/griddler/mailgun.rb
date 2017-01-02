@@ -30,9 +30,9 @@ module Griddler
     # 1. html 的方法为只切取自定义的 <blockquote> 标签
     # 2. text 的处理, 走默认方法
     def extract_body
-      html = sanitize(params.fetch(:html, ''), attributes: ['src', 'id'])
+      html = params.fetch(:html, '')
       if html.present?
-        EmailParser.extract_reply_body_html(html, client)
+        EmailParser.extract_reply_body_html(html, email_client)
       else
         EmailParser.extract_reply_body(text_or_sanitized_html)
       end
