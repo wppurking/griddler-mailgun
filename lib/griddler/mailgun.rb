@@ -52,7 +52,10 @@ module Griddler
         doc.at_css('body > .gmail_extra > .gmail_quote').remove
         doc.at_css('body').inner_html
       when :icloud
-        doc.at_css('body > div > blockquote[type=cite]').remove
+        # Apple Mail
+        doc.at_css('body > div > blockquote[type=cite]')&.remove
+        # iPhone
+        doc.at_css('body > blockquote[type=cite]')&.remove
         doc.at_css('body').inner_html
       end
     end

@@ -4,6 +4,7 @@ describe Griddler::EmailParser do
   let(:outlook) { File.open('spec/griddler/outlook.html').read }
   let(:gmail) { File.open('spec/griddler/gmail.html').read }
   let(:apple_mail) { File.open('spec/griddler/apple_mail.html').read }
+  let(:iphone) { File.open('spec/griddler/iphone.html').read }
 
   it 'outlook reply part' do
     h   = subject.extract_reply_body_html(outlook, :outlook_web)
@@ -28,6 +29,13 @@ describe Griddler::EmailParser do
     doc = Nokogiri::HTML.parse(h)
     expect(doc.css('blockquote[type=cite]').size).to eq 0
     expect(doc.at_css('img')['src']).to eq 'cid:555F7AEF-4A81-4E01-9B10-1393395B7B2A'
+  end
+
+  it 'apple iphone reply part' do
+    h   = subject.extract_reply_body_html(iphone, :icloud)
+    doc = Nokogiri::HTML.parse(h)
+    expect(doc.css('blockquote[type=cite]').size).to eq 0
+    expect(doc.at_css('img')['src']).to eq 'cid:07654E88-C035-45AC-B0CC-A146E641DB4A'
   end
 
   #[ ] 1 Apple iPhone 33% -0.76
