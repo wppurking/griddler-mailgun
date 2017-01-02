@@ -38,7 +38,7 @@ describe Griddler::EmailParser do
     expect(doc.at_css('img')['src']).to eq 'cid:07654E88-C035-45AC-B0CC-A146E641DB4A'
   end
 
-  #[ ] 1 Apple iPhone 33% -0.76
+  #[x] 1 Apple iPhone 33% -0.76
   #[x] 2 Gmail 19% +1.6
   #[ ] 3 Apple iPad 12% +0.17
   #[ ] 4 Google Android 8% +0.07
