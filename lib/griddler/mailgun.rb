@@ -10,7 +10,8 @@ module Griddler
   class Email
     CLIENT_PATTERNS = {
       # outlook web
-      outlook_web: /prod\.outlook\.com/
+      outlook_web: /prod\.outlook\.com/,
+      gmail:       /mail\.gmail\.com/
     }
 
     def content_ids
@@ -46,6 +47,9 @@ module Griddler
       case client
       when :outlook_web
         doc.at_css('body > #divtagdefaultwrapper').to_s
+      when :gmail
+        doc.at_css('body > .gmail_extra > .gmail_quote').remove
+        doc.at_css('body').inner_html
       end
     end
   end
