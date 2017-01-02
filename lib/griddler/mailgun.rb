@@ -15,6 +15,29 @@ module Griddler
       icloud:      /icloud\.com/
     }
 
+    # 调整加载的顺序
+    def initialize(params)
+      @params = params
+
+      @to = recipients(:to)
+      @from = extract_address(params[:from])
+      @subject = extract_subject
+
+      @headers = extract_headers
+
+      @cc = recipients(:cc)
+      @bcc = recipients(:bcc)
+
+      @raw_headers = params[:headers]
+
+      @body = extract_body
+      @raw_text = params[:text]
+      @raw_html = params[:html]
+      @raw_body = @raw_text.presence || @raw_html
+
+      @attachments = params[:attachments]
+    end
+
     def content_ids
       @params[:content_ids].presence || []
     end
