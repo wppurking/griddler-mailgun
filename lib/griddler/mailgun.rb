@@ -19,18 +19,18 @@ module Griddler
     def initialize(params)
       @params = params
 
-      @to = recipients(:to)
-      @from = extract_address(params[:from])
+      @to      = recipients(:to)
+      @from    = extract_address(params[:from])
       @subject = extract_subject
 
       @headers = extract_headers
 
-      @cc = recipients(:cc)
+      @cc  = recipients(:cc)
       @bcc = recipients(:bcc)
 
       @raw_headers = params[:headers]
 
-      @body = extract_body
+      @body     = extract_body
       @raw_text = params[:text]
       @raw_html = params[:html]
       @raw_body = @raw_text.presence || @raw_html
@@ -72,7 +72,7 @@ module Griddler
       when :outlook_web
         doc.at_css('body > #divtagdefaultwrapper').to_s
       when :gmail
-        doc.at_css('body > .gmail_extra > .gmail_quote').remove
+        doc.at_css('body > .gmail_extra > .gmail_quote')&.remove
         doc.at_css('body').inner_html
       when :icloud
         # Apple Mail
