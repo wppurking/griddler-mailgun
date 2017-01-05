@@ -91,6 +91,17 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
                                          ]
   end
 
+  it 'handles X-Forwarded-To address' do
+    params            = default_params.merge(
+      'X-Forwarded-To': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
+    )
+    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+    expect(normalized_params[:forwards]).to eq [
+                                                 'Alice Cooper <alice@example.org>',
+                                                 'John Doe <john@example.com>'
+                                               ]
+  end
+
   it 'handles missing params' do
     normalized_params = Griddler::Mailgun::Adapter.normalize_params(short_params)
     expect(normalized_params[:to]).to eq ['johndoe@example.com']

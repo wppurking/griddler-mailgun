@@ -18,6 +18,7 @@ module Griddler
           cc:          cc_recipients,
           bcc:         Array.wrap(param_or_header(:Bcc)),
           from:        determine_sender,
+          forwards:    determine_forwards,
           subject:     params[:subject],
           text:        params['stripped-text'],
           html:        params['body-html'],
@@ -32,6 +33,11 @@ module Griddler
       def determine_sender
         sender = param_or_header(:From)
         sender ||= params[:sender]
+      end
+
+      def determine_forwards
+        forwards = param_or_header(:'X-Forwarded-To')
+        forwards ? forwards.split(',').map(&:strip) : []
       end
 
       def to_recipients
