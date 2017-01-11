@@ -20,7 +20,7 @@ module Griddler
           from:        determine_sender,
           forwards:    determine_forwards,
           subject:     params[:subject],
-          text:        params['stripped-text'],
+          text:        params['body-plain'],
           html:        params['body-html'],
           attachments: attachment_files,
           headers:     headers,
