@@ -102,6 +102,44 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
                                                ]
   end
 
+  context 'handles recipients address' do
+    it 'both recipients and recipient' do
+      params            = default_params.merge(
+        'recipients': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
+      )
+      normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+      expect(normalized_params[:recipients]).to eq [
+                                                     'Alice Cooper <alice@example.org>',
+                                                     'John Doe <john@example.com>'
+                                                   ]
+    end
+
+    it 'only recipients' do
+      params = default_params.merge(
+        'recipients': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
+      )
+      params.delete('recipient')
+      normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+      expect(normalized_params[:recipients]).to eq [
+                                                     'Alice Cooper <alice@example.org>',
+                                                     'John Doe <john@example.com>'
+                                                   ]
+
+    end
+
+    it 'only recipient' do
+      params            = default_params.merge(
+        'recipient': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
+      )
+      normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+      expect(normalized_params[:recipients]).to eq [
+                                                     'Alice Cooper <alice@example.org>',
+                                                     'John Doe <john@example.com>'
+                                                   ]
+
+    end
+  end
+
   it 'handles missing params' do
     normalized_params = Griddler::Mailgun::Adapter.normalize_params(short_params)
     expect(normalized_params[:to]).to eq ['johndoe@example.com']

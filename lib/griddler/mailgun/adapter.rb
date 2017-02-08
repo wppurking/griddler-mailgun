@@ -19,6 +19,7 @@ module Griddler
           bcc:         Array.wrap(param_or_header(:Bcc)),
           from:        determine_sender,
           forwards:    determine_forwards,
+          recipients:  determine_recipients,
           subject:     params[:subject],
           text:        params['body-plain'],
           html:        params['body-html'],
@@ -40,10 +41,15 @@ module Griddler
         forwards ? forwards.split(',').map(&:strip) : []
       end
 
+      def determine_recipients
+        recipients = params[:recipients]
+        recipients ||= params[:recipient]
+        recipients.split(',').map(&:strip)
+      end
+
       def to_recipients
         to_emails = param_or_header(:To)
         to_emails ||= params[:recipient]
-        to_emails ||= params[:recipients]
         to_emails.split(',').map(&:strip)
       end
 
