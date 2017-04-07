@@ -91,51 +91,40 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
                                          ]
   end
   
-  it 'handles X-Forwarded-To address' do
-    params            = default_params.merge(
-      'X-Forwarded-To': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
-    )
-    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
-    expect(normalized_params[:forwards]).to eq [
-                                                 'Alice Cooper <alice@example.org>',
-                                                 'John Doe <john@example.com>'
-                                               ]
-  end
-  
   context 'handles recipients address' do
     it 'both recipients and recipient' do
       params            = default_params.merge(
-        'recipients': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
+        recipients: 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
       )
       normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
-      expect(normalized_params[:recipients]).to eq [
-                                                     'Alice Cooper <alice@example.org>',
-                                                     'John Doe <john@example.com>'
-                                                   ]
+      expect(normalized_params[:raw_recipients]).to eq [
+                                                         'Alice Cooper <alice@example.org>',
+                                                         'John Doe <john@example.com>'
+                                                       ]
     end
     
     it 'only recipients' do
       params = default_params.merge(
-        'recipients': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
+        recipients: 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
       )
       params.delete('recipient')
       normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
-      expect(normalized_params[:recipients]).to eq [
-                                                     'Alice Cooper <alice@example.org>',
-                                                     'John Doe <john@example.com>'
-                                                   ]
+      expect(normalized_params[:raw_recipients]).to eq [
+                                                         'Alice Cooper <alice@example.org>',
+                                                         'John Doe <john@example.com>'
+                                                       ]
     
     end
     
     it 'only recipient' do
       params            = default_params.merge(
-        'recipient': 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
+        recipient: 'Alice Cooper <alice@example.org>, John Doe <john@example.com>'
       )
       normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
-      expect(normalized_params[:recipients]).to eq [
-                                                     'Alice Cooper <alice@example.org>',
-                                                     'John Doe <john@example.com>'
-                                                   ]
+      expect(normalized_params[:raw_recipients]).to eq [
+                                                         'Alice Cooper <alice@example.org>',
+                                                         'John Doe <john@example.com>'
+                                                       ]
     
     end
   end
