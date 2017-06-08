@@ -2,16 +2,16 @@ module Griddler
   module Mailgun
     class Adapter
       attr_reader :params
-      
+
       def initialize(params)
         @params = params
       end
-      
+
       def self.normalize_params(params)
         adapter = new(params)
         adapter.normalize_params
       end
-      
+
       def normalize_params
         {
           to:             to_recipients,
@@ -23,41 +23,42 @@ module Griddler
           html:           params['body-html'],
           attachments:    attachment_files,
           headers:        headers,
-          
+
           # prepared params for Griddler::Email to parse. Also can custom griddler.email_class
           raw_recipients: raw_recipients,
+          spam_report:    spam_report,
           content_ids:    content_id_map
         }
       end
-      
+
       private
-      
+
       def determine_sender
         sender = param_or_header(:From)
         sender ||= params[:sender]
       end
-      
+
       def raw_recipients
         recipients = params[:recipients]
         recipients ||= params[:recipient]
         recipients.split(',').map(&:strip)
       end
-      
+
       def to_recipients
         to_emails = param_or_header(:To)
         to_emails ||= params[:recipient]
         to_emails.split(',').map(&:strip)
       end
-      
+
       def cc_recipients
         cc = param_or_header(:Cc) || ''
         cc.split(',').map(&:strip)
       end
-      
+
       def headers
         @headers ||= extract_headers
       end
-      
+
       def extract_headers
         extracted_headers = {}
         if params['message-headers']
@@ -66,7 +67,20 @@ module Griddler
         end
         ActiveSupport::HashWithIndifferentAccess.new(extracted_headers)
       end
-      
+
+      # X-Mailgun-Spam-Rules
+      # X-Mailgun-Spf
+      # X-Mailgun-Sscore
+      # X-Mailgun-Sflag
+      def spam_report
+        {
+          spam_rules: headers['X-Mailgun-Spam-Rules'],
+          score:      headers['X-Mailgun-Sscore'].to_i,
+          pf:         headers['X-Mailgun-Spf'],
+          flag:       headers['X-Mailgun-Sflag']
+        }
+      end
+
       def param_or_header(key)
         if params[key].present?
           params[key]
@@ -76,7 +90,7 @@ module Griddler
           nil
         end
       end
-      
+
       # content_id_map 与 attachment_files 的数量一致. 索引位置一致, 用于获取 content_id
       def content_id_map
         if params["attachment-count"].present? && params['content-id-map'].present?
@@ -89,11 +103,11 @@ module Griddler
           []
         end
       end
-      
+
       def attachment_files
         if params["attachment-count"].present?
           attachment_count = params["attachment-count"].to_i
-          
+
           attachment_count.times.map do |index|
             params.delete("attachment-#{index+1}")
           end
