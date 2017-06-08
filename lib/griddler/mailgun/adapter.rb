@@ -75,7 +75,7 @@ module Griddler
       def spam_report
         {
           spam_rules: headers['X-Mailgun-Spam-Rules'],
-          score:      headers['X-Mailgun-Sscore'].to_i,
+          score:      headers['X-Mailgun-Sscore'].to_f,
           pf:         headers['X-Mailgun-Spf'],
           flag:       headers['X-Mailgun-Sflag']
         }

@@ -142,6 +142,15 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
     email             = Griddler::Email.new(normalized_params)
     expect(email.headers["Reply-To"]).to eq "mail2@example.mailgun.org"
   end
+
+  it 'handles spam header info' do
+    params            = default_params.merge(
+      'message-headers' => '[[ "X-Mailgun-Spam-Rules", "DKIM_SIGNED, DKIM_VALID, HTML_MESSAGE, RCVD_IN_DNSWL_NONE, RCVD_IN_MSPIKE_H2, SPF_PASS, T_HEADER_FROM_DIFFERENT_DOMAINS" ], [ "X-Mailgun-Dkim-Check-Result", "Pass" ], [ "X-Mailgun-Spf", "Pass" ], [ "X-Mailgun-Sscore", "0.0" ], [ "X-Mailgun-Sflag", "No" ]]'
+    )
+    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+    email             = Griddler::Email.new(normalized_params)
+    expect(email.spam_report).to eq ({spam_rules: 'DKIM_SIGNED, DKIM_VALID, HTML_MESSAGE, RCVD_IN_DNSWL_NONE, RCVD_IN_MSPIKE_H2, SPF_PASS, T_HEADER_FROM_DIFFERENT_DOMAINS', score: 0.0, pf: 'Pass', flag: 'No'})
+  end
   
   it 'adds Bcc when it exists' do
     params            = default_params.merge('Bcc' => 'bcc@example.com')
